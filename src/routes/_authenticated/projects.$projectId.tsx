@@ -259,7 +259,7 @@ function ProjectPage() {
                       value={[draft.progress ?? 0]}
                       max={100}
                       step={5}
-                      onValueChange={([v]) => setDraft({ ...draft, progress: v })}
+                      onValueChange={([v]) => setDraft({ ...draft, progress: v ?? 0 })}
                     />
                   </div>
                   <div className="flex flex-wrap gap-3 pt-2">

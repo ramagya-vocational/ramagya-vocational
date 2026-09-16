@@ -35,8 +35,8 @@ export function AppHeader({
   teacher,
 }: {
   name: string;
-  meta?: string;
-  teacher?: boolean;
+  meta?: string | undefined;
+  teacher?: boolean | undefined;
 }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
