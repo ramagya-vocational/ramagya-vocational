@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedTeacherRouteImport } from './routes/_authenticated/teacher'
 import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects.$projectId'
+import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/seed-admin'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const AuthenticatedProjectsProjectIdRoute =
     path: '/projects/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicSeedAdminRoute = ApiPublicSeedAdminRouteImport.update({
+  id: '/api/public/seed-admin',
+  path: '/api/public/seed-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/teacher': typeof AuthenticatedTeacherRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
+  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/teacher': typeof AuthenticatedTeacherRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
+  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,12 +77,25 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/teacher': typeof AuthenticatedTeacherRoute
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
+  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/teacher' | '/projects/$projectId'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/teacher'
+    | '/projects/$projectId'
+    | '/api/public/seed-admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/teacher' | '/projects/$projectId'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/teacher'
+    | '/projects/$projectId'
+    | '/api/public/seed-admin'
   id:
     | '__root__'
     | '/'
@@ -83,12 +104,14 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/teacher'
     | '/_authenticated/projects/$projectId'
+    | '/api/public/seed-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicSeedAdminRoute: typeof ApiPublicSeedAdminRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -135,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectsProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/seed-admin': {
+      id: '/api/public/seed-admin'
+      path: '/api/public/seed-admin'
+      fullPath: '/api/public/seed-admin'
+      preLoaderRoute: typeof ApiPublicSeedAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -157,6 +187,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicSeedAdminRoute: ApiPublicSeedAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
