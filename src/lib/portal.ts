@@ -32,6 +32,9 @@ export type Project = {
   progress: number;
   created_at: string;
   updated_at: string;
+  review_status: string;
+  teacher_feedback: string | null;
+  reviewed_at: string | null;
 };
 
 export type ProjectUpdate = {
@@ -41,7 +44,28 @@ export type ProjectUpdate = {
   note: string;
   progress: number | null;
   created_at: string;
+  review_status: string;
+  teacher_note: string | null;
+  reviewed_at: string | null;
 };
+
+export const REVIEW_LABELS: Record<string, string> = {
+  draft: "Draft",
+  pending: "Waiting for teacher",
+  approved: "Approved",
+  accepted: "Accepted",
+  denied: "Needs changes",
+};
+
+export function reviewLabel(value: string | null | undefined) {
+  return REVIEW_LABELS[value ?? "draft"] ?? "Draft";
+}
+
+/** Supabase requires at least 6 characters, so short school passwords get a suffix. */
+export function normalizePassword(raw: string) {
+  const p = raw.trim();
+  return p.length < 6 ? `${p}@rmgy` : p;
+}
 
 export const STATUSES = [
   { value: "not_started", label: "Not started" },
