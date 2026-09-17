@@ -7,7 +7,7 @@ import { Brand } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { usernameToEmail, useSession } from "@/lib/portal";
+import { normalizePassword, usernameToEmail, useSession } from "@/lib/portal";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
