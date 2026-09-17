@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, BookOpen, LineChart, Link2, ShieldCheck } from "lucide-react";
 import heroImg from "@/assets/hero-lab.jpg";
 import { Brand } from "@/components/AppHeader";
+import { CinematicIntro } from "@/components/CinematicIntro";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/portal";
 
@@ -53,6 +54,7 @@ function Landing() {
 
   return (
     <div className="min-h-screen">
+      <CinematicIntro />
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
         <Brand />
         <Button asChild size="lg" className="gradient-sun border-0 text-primary-foreground shadow-md">

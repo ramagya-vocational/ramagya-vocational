@@ -7,7 +7,7 @@ import { Brand } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { usernameToEmail, useSession } from "@/lib/portal";
+import { normalizePassword, usernameToEmail, useSession } from "@/lib/portal";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -45,10 +45,17 @@ function AuthPage() {
       return;
     }
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: usernameToEmail(username),
+    const email = usernameToEmail(username);
+    let { error } = await supabase.auth.signInWithPassword({
+      email,
       password: password.trim(),
     });
+    if (error) {
+      ({ error } = await supabase.auth.signInWithPassword({
+        email,
+        password: normalizePassword(password),
+      }));
+    }
     setBusy(false);
     if (error) {
       toast.error("Those details didn't match. Check your username and password.");

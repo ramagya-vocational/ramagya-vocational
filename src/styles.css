@@ -133,3 +133,127 @@
     box-shadow: var(--shadow-lift);
   }
 }
+
+/* ---------- Cinematic intro ---------- */
+@keyframes intro-out {
+  0%,
+  82% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.12);
+    filter: blur(14px);
+  }
+}
+
+@keyframes intro-crest {
+  0% {
+    opacity: 0;
+    transform: scale(0.55) rotate(-14deg);
+    filter: blur(18px) brightness(2.4);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.06) rotate(0deg);
+    filter: blur(0) brightness(1.25);
+  }
+  70% {
+    transform: scale(1) rotate(0deg);
+  }
+  100% {
+    transform: scale(1.04) rotate(0deg);
+    opacity: 1;
+    filter: blur(0) brightness(1);
+  }
+}
+
+@keyframes intro-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  35% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+@keyframes intro-sweep {
+  0% {
+    transform: translateX(-130%) skewX(-18deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(130%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+@keyframes intro-word {
+  0% {
+    opacity: 0;
+    transform: translateY(1.1em) rotateX(65deg);
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+    filter: blur(0);
+  }
+}
+
+@keyframes intro-rule {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes intro-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate3d(0, -140px, 0) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes intro-grid {
+  0% {
+    opacity: 0;
+    transform: perspective(700px) rotateX(72deg) translateY(30%) scale(1.6);
+  }
+  40% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.18;
+    transform: perspective(700px) rotateX(72deg) translateY(0%) scale(2.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-intro] *,
+  [data-intro] {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
