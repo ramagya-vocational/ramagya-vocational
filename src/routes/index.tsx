@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, BookOpen, LineChart, Link2, ShieldCheck } from "lucide-react";
 import heroImg from "@/assets/hero-lab.jpg";
 import { Brand } from "@/components/AppHeader";
+import { CinematicIntro } from "@/components/CinematicIntro";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/portal";
 
