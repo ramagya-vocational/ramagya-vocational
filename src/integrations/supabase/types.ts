@@ -78,7 +78,10 @@ export type Database = {
           note: string
           progress: number | null
           project_id: string
+          review_status: string
+          reviewed_at: string | null
           student_id: string
+          teacher_note: string | null
         }
         Insert: {
           created_at?: string
@@ -86,7 +89,10 @@ export type Database = {
           note: string
           progress?: number | null
           project_id: string
+          review_status?: string
+          reviewed_at?: string | null
           student_id: string
+          teacher_note?: string | null
         }
         Update: {
           created_at?: string
@@ -94,7 +100,10 @@ export type Database = {
           note?: string
           progress?: number | null
           project_id?: string
+          review_status?: string
+          reviewed_at?: string | null
           student_id?: string
+          teacher_note?: string | null
         }
         Relationships: [
           {
@@ -114,8 +123,11 @@ export type Database = {
           id: string
           link_url: string | null
           progress: number
+          review_status: string
+          reviewed_at: string | null
           status: string
           student_id: string
+          teacher_feedback: string | null
           title: string
           updated_at: string
         }
@@ -126,8 +138,11 @@ export type Database = {
           id?: string
           link_url?: string | null
           progress?: number
+          review_status?: string
+          reviewed_at?: string | null
           status?: string
           student_id: string
+          teacher_feedback?: string | null
           title: string
           updated_at?: string
         }
@@ -138,8 +153,11 @@ export type Database = {
           id?: string
           link_url?: string | null
           progress?: number
+          review_status?: string
+          reviewed_at?: string | null
           status?: string
           student_id?: string
+          teacher_feedback?: string | null
           title?: string
           updated_at?: string
         }
