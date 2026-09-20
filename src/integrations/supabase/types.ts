@@ -21,7 +21,10 @@ export type Database = {
           description: string | null
           id: string
           order_index: number
+          source_key: string | null
+          source_page: number | null
           title: string
+          unit_title: string | null
         }
         Insert: {
           class_name?: string
@@ -29,7 +32,10 @@ export type Database = {
           description?: string | null
           id?: string
           order_index?: number
+          source_key?: string | null
+          source_page?: number | null
           title: string
+          unit_title?: string | null
         }
         Update: {
           class_name?: string
@@ -37,7 +43,10 @@ export type Database = {
           description?: string | null
           id?: string
           order_index?: number
+          source_key?: string | null
+          source_page?: number | null
           title?: string
+          unit_title?: string | null
         }
         Relationships: []
       }

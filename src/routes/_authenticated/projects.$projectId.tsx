@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, ExternalLink, Loader2, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, Loader2, Save, Send, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import {
   fetchMe,
+  reviewLabel,
   statusLabel,
   STATUSES,
   type Chapter,
@@ -122,9 +123,10 @@ function ProjectPage() {
   const addUpdate = useMutation({
     mutationFn: async () => {
       if (!note.trim()) throw new Error("Write a short update first.");
+      if (!me.data?.id) throw new Error("Your session has ended. Sign in again.");
       const { error } = await supabase.from("project_updates").insert({
         project_id: projectId,
-        student_id: me.data!.id,
+        student_id: me.data.id,
         note: note.trim().slice(0, 1000),
         progress: draft.progress ?? project.data?.progress ?? 0,
       });
@@ -136,6 +138,22 @@ function ProjectPage() {
       queryClient.invalidateQueries({ queryKey: ["updates", projectId] });
     },
     onError: (e: Error) => toast.error(e.message || "Could not post the update."),
+  });
+
+  const sendForReview = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("projects")
+        .update({ review_status: "pending", teacher_feedback: null, reviewed_at: null })
+        .eq("id", projectId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Sent to your teacher for review.");
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["my-projects"] });
+    },
+    onError: () => toast.error("Could not send this project for review."),
   });
 
   const remove = useMutation({
@@ -177,7 +195,10 @@ function ProjectPage() {
             <section className="surface p-7">
               <div className="flex items-center justify-between gap-3">
                 <h1 className="text-3xl font-semibold">{project.data.title}</h1>
-                <Badge variant="secondary">{statusLabel(project.data.status)}</Badge>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Badge variant="secondary">{statusLabel(project.data.status)}</Badge>
+                  <Badge variant="outline">{reviewLabel(project.data.review_status)}</Badge>
+                </div>
               </div>
               <Progress value={project.data.progress} className="mt-5 h-2.5" />
               <p className="mt-2 text-sm text-muted-foreground">
@@ -276,6 +297,14 @@ function ProjectPage() {
                       Save changes
                     </Button>
                     <Button
+                      onClick={() => sendForReview.mutate()}
+                      disabled={sendForReview.isPending || project.data.review_status === "pending"}
+                      variant="outline"
+                    >
+                      {sendForReview.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+                      {project.data.review_status === "pending" ? "Waiting for teacher" : "Send for review"}
+                    </Button>
+                    <Button
                       variant="outline"
                       onClick={() => {
                         if (confirm("Delete this project and all its updates?")) remove.mutate();
@@ -292,6 +321,13 @@ function ProjectPage() {
                       {project.data.description}
                     </p>
                   )}
+                </div>
+              )}
+
+              {project.data.teacher_feedback && (
+                <div className="mt-6 border-l-4 border-primary bg-secondary p-4">
+                  <p className="tech-label">Teacher feedback</p>
+                  <p className="mt-2 text-sm leading-relaxed">{project.data.teacher_feedback}</p>
                 </div>
               )}
 
@@ -333,9 +369,10 @@ function ProjectPage() {
                 {(updates.data ?? []).map((u) => (
                   <li key={u.id} className="border-l-2 border-primary/40 pl-4">
                     <p className="text-xs text-muted-foreground">
-                      {new Date(u.created_at).toLocaleString()} · {u.progress ?? 0}%
+                      {new Date(u.created_at).toLocaleString()} · {u.progress ?? 0}% · {reviewLabel(u.review_status)}
                     </p>
                     <p className="mt-1 text-sm">{u.note}</p>
+                    {u.teacher_note && <p className="mt-2 text-xs font-medium text-primary">Teacher: {u.teacher_note}</p>}
                   </li>
                 ))}
                 {(updates.data ?? []).length === 0 && (
