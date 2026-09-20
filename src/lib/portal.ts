@@ -19,6 +19,9 @@ export type Chapter = {
   description: string | null;
   class_name: string;
   order_index: number;
+  unit_title?: string | null;
+  source_page?: number | null;
+  source_key?: string | null;
 };
 
 export type Project = {
