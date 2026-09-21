@@ -26,7 +26,9 @@ import {
   STATUSES,
   type Chapter,
   type Project,
+  type ProjectAssessment,
   type ProjectUpdate,
+  RUBRIC_CRITERIA,
 } from "@/lib/portal";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
@@ -88,6 +90,19 @@ function ProjectPage() {
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as ProjectUpdate[];
+    },
+  });
+
+  const assessment = useQuery({
+    queryKey: ["assessment", projectId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("project_assessments")
+        .select("*")
+        .eq("project_id", projectId)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as ProjectAssessment | null) ?? null;
     },
   });
 
@@ -328,6 +343,26 @@ function ProjectPage() {
                 <div className="mt-6 border-l-4 border-primary bg-secondary p-4">
                   <p className="tech-label">Teacher feedback</p>
                   <p className="mt-2 text-sm leading-relaxed">{project.data.teacher_feedback}</p>
+                </div>
+              )}
+
+              {assessment.data && project.data.review_status === "approved" && (
+                <div className="assessment-result mt-6">
+                  <div className="assessment-heading">
+                    <div>
+                      <p className="tech-label">Rubric-based assessment</p>
+                      <h3>Project score</h3>
+                    </div>
+                    <strong>{assessment.data.total_score ?? 0}<span>/60</span></strong>
+                  </div>
+                  <div className="assessment-result-grid">
+                    {RUBRIC_CRITERIA.map(({ key, label }) => (
+                      <div key={key}>
+                        <span>{label}</span>
+                        <b>{assessment.data?.[key] ?? 0}/10</b>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 

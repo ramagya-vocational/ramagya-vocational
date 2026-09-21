@@ -52,6 +52,44 @@ export type ProjectUpdate = {
   reviewed_at: string | null;
 };
 
+export type ProjectAssessment = {
+  id: string;
+  project_id: string;
+  assessor_id: string;
+  planning: number;
+  practical_execution: number;
+  creativity: number;
+  sustainability: number;
+  documentation: number;
+  presentation: number;
+  total_score: number | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type RubricScores = Pick<
+  ProjectAssessment,
+  | "planning"
+  | "practical_execution"
+  | "creativity"
+  | "sustainability"
+  | "documentation"
+  | "presentation"
+>;
+
+export const RUBRIC_CRITERIA: Array<{ key: keyof RubricScores; label: string }> = [
+  { key: "planning", label: "Planning" },
+  { key: "practical_execution", label: "Practical execution" },
+  { key: "creativity", label: "Creativity" },
+  { key: "sustainability", label: "Sustainability" },
+  { key: "documentation", label: "Documentation" },
+  { key: "presentation", label: "Presentation" },
+];
+
+export function rubricTotal(scores: Partial<RubricScores>) {
+  return RUBRIC_CRITERIA.reduce((total, criterion) => total + (scores[criterion.key] ?? 0), 0);
+}
+
 export const REVIEW_LABELS: Record<string, string> = {
   draft: "Draft",
   pending: "Waiting for teacher",
