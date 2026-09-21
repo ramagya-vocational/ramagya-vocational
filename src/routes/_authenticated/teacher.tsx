@@ -26,7 +26,11 @@ import {
   type Chapter,
   type Profile,
   type Project,
+  type ProjectAssessment,
   type ProjectUpdate,
+  type RubricScores,
+  RUBRIC_CRITERIA,
+  rubricTotal,
 } from "@/lib/portal";
 
 export const Route = createFileRoute("/_authenticated/teacher")({
@@ -54,6 +58,7 @@ function TeacherPage() {
   const [chapterForm, setChapterForm] = useState({ title: "", description: "" });
   const [section, setSection] = useState(SECTIONS[0] as string);
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const [rubrics, setRubrics] = useState<Record<string, Partial<RubricScores>>>({});
 
   const me = useQuery({ queryKey: ["me"], queryFn: fetchMe });
   const isTeacher = !!me.data?.isTeacher;
@@ -104,13 +109,39 @@ function TeacherPage() {
     enabled: isTeacher,
   });
 
+  const assessments = useQuery({
+    queryKey: ["all-assessments"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("project_assessments").select("*");
+      if (error) throw error;
+      return (data ?? []) as ProjectAssessment[];
+    },
+    enabled: isTeacher,
+  });
+
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: ["all-projects"] });
     queryClient.invalidateQueries({ queryKey: ["all-updates"] });
+    queryClient.invalidateQueries({ queryKey: ["all-assessments"] });
   };
 
   const reviewProject = useMutation({
     mutationFn: async (v: { id: string; decision: "approved" | "denied" }) => {
+      if (!me.data?.id) throw new Error("Your session has ended. Sign in again.");
+      if (v.decision === "approved") {
+        const existing = (assessments.data ?? []).find((assessment) => assessment.project_id === v.id);
+        const scores = { ...existing, ...rubrics[v.id] };
+        const complete = RUBRIC_CRITERIA.every(({ key }) => Number.isInteger(scores[key]));
+        if (!complete) throw new Error("Score every rubric category before approving.");
+        const assessment = Object.fromEntries(
+          RUBRIC_CRITERIA.map(({ key }) => [key, Math.min(10, Math.max(0, scores[key] ?? 0))]),
+        ) as RubricScores;
+        const { error: assessmentError } = await supabase.from("project_assessments").upsert(
+          { project_id: v.id, assessor_id: me.data.id, ...assessment },
+          { onConflict: "project_id" },
+        );
+        if (assessmentError) throw assessmentError;
+      }
       const { error } = await supabase
         .from("projects")
         .update({
@@ -125,7 +156,7 @@ function TeacherPage() {
       toast.success(v.decision === "approved" ? "Project approved." : "Sent back to the student.");
       invalidateAll();
     },
-    onError: () => toast.error("Could not save that decision."),
+    onError: (error: Error) => toast.error(error.message || "Could not save that decision."),
   });
 
   const reviewUpdate = useMutation({
@@ -246,6 +277,48 @@ function TeacherPage() {
     />
   );
 
+  const rubricBox = (projectId: string) => {
+    const saved = (assessments.data ?? []).find((assessment) => assessment.project_id === projectId);
+    const current = { ...saved, ...rubrics[projectId] };
+    return (
+      <div className="assessment-rubric mt-5">
+        <div className="assessment-heading">
+          <div>
+            <p className="tech-label">Rubric-based assessment</p>
+            <h4>Project scorecard</h4>
+          </div>
+          <strong>{rubricTotal(current)}<span>/60</span></strong>
+        </div>
+        <div className="assessment-grid">
+          {RUBRIC_CRITERIA.map(({ key, label }) => (
+            <label key={key}>
+              <span>{label}</span>
+              <span className="assessment-input">
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={10}
+                  step={1}
+                  aria-label={`${label} score out of 10`}
+                  value={current[key] ?? ""}
+                  onChange={(event) => {
+                    const next = event.target.value === "" ? undefined : Math.min(10, Math.max(0, Number(event.target.value)));
+                    setRubrics((previous) => ({
+                      ...previous,
+                      [projectId]: { ...previous[projectId], [key]: next },
+                    }));
+                  }}
+                />
+                <b>/10</b>
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen">
       <AppHeader
@@ -315,6 +388,7 @@ function TeacherPage() {
                           Open shared work
                         </a>
                       )}
+                       {rubricBox(p.id)}
                       {noteBox(p.id, "Feedback for the student (optional)")}
                       <div className="mt-3 flex gap-2">
                         <Button

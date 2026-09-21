@@ -80,6 +80,59 @@ export type Database = {
         }
         Relationships: []
       }
+      project_assessments: {
+        Row: {
+          assessor_id: string
+          created_at: string
+          creativity: number
+          documentation: number
+          id: string
+          planning: number
+          practical_execution: number
+          presentation: number
+          project_id: string
+          sustainability: number
+          total_score: number | null
+          updated_at: string
+        }
+        Insert: {
+          assessor_id: string
+          created_at?: string
+          creativity: number
+          documentation: number
+          id?: string
+          planning: number
+          practical_execution: number
+          presentation: number
+          project_id: string
+          sustainability: number
+          total_score?: number | null
+          updated_at?: string
+        }
+        Update: {
+          assessor_id?: string
+          created_at?: string
+          creativity?: number
+          documentation?: number
+          id?: string
+          planning?: number
+          practical_execution?: number
+          presentation?: number
+          project_id?: string
+          sustainability?: number
+          total_score?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_assessments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_updates: {
         Row: {
           created_at: string

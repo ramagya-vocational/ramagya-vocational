@@ -15,6 +15,13 @@
       "when": 1789912461115,
       "tag": "0001_add_kaushal_vikas_chapters",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789978940483,
+      "tag": "0002_create_project_assessments",
+      "breakpoints": true
     }
   ]
 }
